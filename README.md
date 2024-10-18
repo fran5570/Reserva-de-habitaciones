@@ -6,11 +6,11 @@ Este proyecto es una aplicación de gestión de reservas que permite a los clien
 
 ## Herencia y Polimorfismo
 
-### Principios Solid
+## Principios Solid
 
-### modo de ejecucion por consola python main.py
+## modo de ejecucion por consola python main.py
 
-### interface grafica python gui.py
+## interface grafica python gui.py
 
 ### Cada clase en nuestro proyecto tiene una única responsabilidad. Por ejemplo, la clase Cliente solo maneja la información del cliente (Single Responsibility Principle)
 
