@@ -1,5 +1,8 @@
+import logging
 from datetime import datetime
 from models.habitacion import Habitacion
+
+logger = logging.getLogger(__name__)
 
 class Reserva:
     def __init__(self, cliente, habitacion: Habitacion, fecha_inicio, fecha_fin):
@@ -15,4 +18,5 @@ class Reserva:
 
     def confirmar_reserva(self):
         self.habitacion.marcar_ocupada()
-        print(f"Reserva confirmada para {self.cliente.nombre}. Total a pagar: {self.calcular_total()}")
+        total = self.calcular_total()
+        logger.info(f"Reserva confirmada para {self.cliente.nombre}. Total a pagar: {self.calcular_total()}")

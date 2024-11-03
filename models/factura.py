@@ -1,3 +1,6 @@
+import logging
+logger = logging.getLogger(__name__)
+
 class Factura:
     def __init__(self, numero, cliente, total):
         self.numero = numero
@@ -5,4 +8,4 @@ class Factura:
         self.total = total
     
     def generar_factura(self):
-        print(f"Generando factura para {self.cliente.nombre}. Total: {self.total}")
+        logger.info(f"Generando factura para {self.cliente.nombre}. Total: {self.total}")

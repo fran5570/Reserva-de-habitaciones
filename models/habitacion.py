@@ -1,3 +1,8 @@
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 class Habitacion:
     def __init__(self, numero: int, precio_base: float):
         self.numero = numero
@@ -23,13 +28,18 @@ class Suite(Habitacion):
 
 
 class HabitacionFactory:
+    _habitacion_map = {
+        "simple": Habitacion,
+        "doble": HabitacionDoble,
+        "suite": Suite
+    }
+
     @staticmethod
     def crear_habitacion(tipo, numero, precio_base):
-        if tipo == "simple":
-            return Habitacion(numero, precio_base)
-        elif tipo == "doble":
-            return HabitacionDoble(numero, precio_base)
-        elif tipo == "suite":
-            return Suite(numero, precio_base)
+        habitacion_cls = HabitacionFactory._habitacion_map.get(tipo)
+        if habitacion_cls:
+            logger.info(f"Creando habitación de tipo '{tipo}' con número {numero} y precio base {precio_base}.")
+            return habitacion_cls(numero, precio_base)
         else:
+            logger.error(f"Tipo de habitación desconocido: {tipo}")
             raise ValueError("Tipo de habitación desconocido.")
