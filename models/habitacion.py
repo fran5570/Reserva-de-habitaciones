@@ -2,6 +2,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+import sqlite3
 
 class Habitacion:
     def __init__(self, numero: int, precio_base: float):
@@ -19,7 +20,10 @@ class Habitacion:
         self.ocupada = False
 
 class HabitacionDoble(Habitacion):
+    
     def calcular_precio(self, noches):
+        self.numero
+        self.precio_base
         return self.precio_base * noches * 1.2
 
 class Suite(Habitacion):
