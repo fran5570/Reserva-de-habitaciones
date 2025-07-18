@@ -1,52 +1,56 @@
 import logging
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+import os
+import sqlite3
+import tkinter as tk
+from tkinter import messagebox
+from datetime import datetime
 
 from models.cliente import Cliente
 from models.habitacion import HabitacionDoble
 from services.reserva_service import crear_reserva
-import sqlite3
-import os
 
+# Configuración de logging
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
+# Conexión base de datos
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, "database", "app.db")
-
-conn = sqlite3.connect(DB_PATH)
-
-
 
 def conectar_db():
     conn = sqlite3.connect(DB_PATH)
     return conn
 
+# Función para reservar desde la interfaz
+def reservar():
+    nombre = entry_nombre.get()
+    email = entry_email.get()
+    fecha_inicio = entry_fecha_inicio.get()
+    fecha_fin = entry_fecha_fin.get()
 
-def main():
-
-    cliente = Cliente("Francisco perez", "franciscoperez@gmail.com")
-
-    
+    cliente = Cliente(nombre, email)
     habitacion = HabitacionDoble(101, 100)
 
-    
-    from datetime import datetime
-    fecha_inicio = datetime(2024, 10, 20)
-    fecha_fin = datetime(2024, 10, 22)
+    try:
+        fecha_inicio_dt = datetime.strptime(fecha_inicio, "%Y-%m-%d")
+        fecha_fin_dt = datetime.strptime(fecha_fin, "%Y-%m-%d")
+        crear_reserva(cliente, habitacion, fecha_inicio_dt, fecha_fin_dt)
+        messagebox.showinfo("Éxito", f"Reserva confirmada para {cliente.nombre}.")
+    except Exception as e:
+        messagebox.showerror("Error", str(e))
 
-    
-    crear_reserva(cliente, habitacion, fecha_inicio, fecha_fin)
-
-
-
-def crear_tablas():
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    DB_PATH = os.path.join(BASE_DIR, "database", "app.db")
-
-    # Crea la carpeta 'database' si no existe
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-
-    conn = sqlite3.connect(DB_PATH)
+# Función para eliminar un cliente
+def eliminar_cliente(nombre):
+    conn = conectar_db()
     cursor = conn.cursor()
+    cursor.execute("DELETE FROM reservas WHERE cliente_nombre = ?", (nombre,))
+    conn.commit()
+    conn.close()
 
+# Función para crear las tablas
+def crear_tablas():
+    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    conn = conectar_db()
+    cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS reservas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,11 +62,41 @@ def crear_tablas():
             fecha_fin TEXT NOT NULL
         )
     ''')
-
     conn.commit()
     conn.close()
 
+# Función principal (crea una reserva de prueba)
+def main():
+    cliente = Cliente("Francisco Perez", "franciscoperez@gmail.com")
+    habitacion = HabitacionDoble(101, 100)
+    fecha_inicio = datetime(2024, 10, 20)
+    fecha_fin = datetime(2024, 10, 22)
+    crear_reserva(cliente, habitacion, fecha_inicio, fecha_fin)
 
+# Interfaz gráfica
+root = tk.Tk()
+root.title("Gestión de Reservas")
+
+tk.Label(root, text="Nombre:").pack()
+entry_nombre = tk.Entry(root)
+entry_nombre.pack()
+
+tk.Label(root, text="Email:").pack()
+entry_email = tk.Entry(root)
+entry_email.pack()
+
+tk.Label(root, text="Fecha Inicio (YYYY-MM-DD):").pack()
+entry_fecha_inicio = tk.Entry(root)
+entry_fecha_inicio.pack()
+
+tk.Label(root, text="Fecha Fin (YYYY-MM-DD):").pack()
+entry_fecha_fin = tk.Entry(root)
+entry_fecha_fin.pack()
+
+tk.Button(root, text="Reservar", command=reservar).pack()
+
+# Programa principal
 if __name__ == "__main__":
     crear_tablas()
     main()
+    root.mainloop()
